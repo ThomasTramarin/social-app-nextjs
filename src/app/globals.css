@@ -2,32 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+@layer base {
+  h1 {
+    @apply text-3xl md:text-4xl xl:text-5xl font-bold text-black dark:text-white;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+@layer components {
+  .main-container {
+    @apply flex min-h-screen flex-1 flex-col items-center bg-light-1 dark:bg-dark-1 px-5 pb-10 pt-5 max-md:pb-32 sm:px-10;
+  }
+
+  .bottombar {
+    @apply fixed bottom-0 z-10 w-full px-4 h-16 bg-light-2 dark:bg-dark-2 md:hidden;
+  }
+
+  .sidebar {
+    @apply sticky left-0 top-0 z-20 flex h-screen w-60 shadow-xl flex-col overflow-auto bg-light-2 dark:bg-dark-2 p-5 max-md:hidden;
+  }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .shadow-top-light {
+    box-shadow: 0 -10px 20px rgba(255, 255, 255, 0.5);
   }
+  .shadow-top-dark {
+    box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.5);
+  }
+
 }
