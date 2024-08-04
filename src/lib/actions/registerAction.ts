@@ -13,7 +13,6 @@ type FormState = {
 };
 
 export default async function registerAction(
-  prevState: FormState,
   data: FormData
 ): Promise<FormState> {
   

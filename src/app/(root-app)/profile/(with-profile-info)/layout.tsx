@@ -1,7 +1,7 @@
 import ProfileInfo from "@/components/profile/ProfileInfo";
 import Link from "next/link";
 import { IoSettingsOutline } from "react-icons/io5";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import { getServerSession } from "next-auth";
 export default async function ProfileLayout({
   children,

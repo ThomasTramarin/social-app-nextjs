@@ -1,8 +1,8 @@
 "use client";
 import { registerFormSchema } from "@/lib/validations/registerFormSchema";
+import { useRouter } from "next/navigation";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +21,7 @@ import Link from "next/link";
 
 export default function RegisterForm() {
   const formRef = useRef<HTMLFormElement>(null);
+  const [formState, setFormState] = useState({successMessage: "", errorMessage: ""})
   const router = useRouter();
 
   const form = useForm<z.output<typeof registerFormSchema>>({
@@ -33,21 +34,31 @@ export default function RegisterForm() {
     },
   });
 
-  const [formState, formAction] = useFormState(registerAction, {
-    errorMessage: "",
-    successMessage: "",
-  });
 
-  const onSubmit = () => {
-    formRef.current?.submit();
+  useEffect(()=>{
+    if(formState.successMessage){
+      formRef.current?.reset();
+
+      router.push("/login")
+    }
+  }, [formState])
+
+  const onSubmit = async (data: z.infer<typeof registerFormSchema>) => {
+    const formData = new FormData()
+    formData.append("username", data.username)
+    formData.append("email", data.email)
+    formData.append("password", data.password)
+    formData.append("confirmPassword", data.confirmPassword)
+
+    const res = await registerAction(formData)
+    setFormState(res)
   }
 
   return (
     <Form {...form}>
       <form
-        action={formAction}
-        onSubmit={form.handleSubmit(onSubmit)}
         ref={formRef}
+        onSubmit={form.handleSubmit(onSubmit)}
         className="max-w-md w-full flex flex-col gap-4"
       >
         <FormField
@@ -114,9 +125,7 @@ export default function RegisterForm() {
             );
           }}
         />
-        <Button type="submit" className="w-full">
-          Register
-        </Button>
+        <Button type="submit">Register</Button>
         <p className="text-sm">
           Already have an account? <Link href="/login" className="text-blue underline underline-offset-2">Login</Link>
         </p>

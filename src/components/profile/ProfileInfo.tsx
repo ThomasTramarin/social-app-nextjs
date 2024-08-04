@@ -2,7 +2,8 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { profileLinks, Item } from "@/lib/constants/profileLinks";
-export default function ProfileInfo(userData: any) {
+import { UserProfileData } from "@/lib/types/userTypes";
+export default function ProfileInfo(userData: UserProfileData) {
   const pathname = usePathname();
 
   return (

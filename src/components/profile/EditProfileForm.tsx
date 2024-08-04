@@ -1,12 +1,9 @@
 "use client";
-
 import { editProfileSchema } from "@/lib/validations/editProfileSchema";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -17,12 +14,17 @@ import {
   FormControl,
 } from "@/components/ui/form";
 import { useFormState } from "react-dom";
-import { useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { editProfileAction } from "@/lib/actions/editProfileAction";
+import { UserProfileData } from "@/lib/types/userTypes";
+import { Button } from "../ui/button";
 
-export default function EditProfileForm(userData: any) {
+
+export default function EditProfileForm(userData: UserProfileData) {
   const formRef = useRef<HTMLFormElement>(null);
-  const form = useForm<z.infer<typeof editProfileSchema>>({
+  const [formState, setFormState] = useState({successMessage: "", errorMessage: ""})
+
+  const form = useForm<z.output<typeof editProfileSchema>>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
       username: userData.data.username || "",
@@ -31,16 +33,27 @@ export default function EditProfileForm(userData: any) {
     },
   });
 
-  const [formState, formAction] = useFormState(editProfileAction, {
-    errorMessage: "",
-    successMessage: "",
-  });
+
+  useEffect(()=>{
+    if(formState.successMessage){
+      formRef.current?.reset();
+    }
+  }, [formState])
+
+  const onSubmit = async (data: z.infer<typeof editProfileSchema>) => {
+    const formData = new FormData()
+    formData.append("username", data.username)
+    formData.append("name", data.name)
+    formData.append("bio", data.bio)
+
+    const res = await editProfileAction(formData)
+    setFormState(res)
+  }
 
   return (
     <Form {...form}>
       <form
-        action={formAction}
-        onSubmit={form.handleSubmit(() => formRef.current?.submit())}
+        onSubmit={form.handleSubmit(onSubmit)}
         ref={formRef}
         className="max-w-xl w-full flex flex-col gap-4"
       >
@@ -52,7 +65,7 @@ export default function EditProfileForm(userData: any) {
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="Username" type="text" {...field}/>
+                  <Input placeholder="Username" type="text" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -67,7 +80,7 @@ export default function EditProfileForm(userData: any) {
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Name" type="text" {...field}/>
+                  <Input placeholder="Name" type="text" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -82,7 +95,7 @@ export default function EditProfileForm(userData: any) {
               <FormItem>
                 <FormLabel>Bio</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Bio" {...field}/>
+                  <Textarea placeholder="Bio" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -1,40 +1,43 @@
 "use server";
-import { useSession } from "next-auth/react";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import { db } from "@/db";
 import { usersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
+import { editProfileSchema } from "../validations/editProfileSchema";
 
 type FormState = {
   errorMessage: string;
   successMessage: string;
 };
 
-export async function editProfileAction(prevState: FormState, data: FormData) {
+export async function editProfileAction(data: FormData): Promise<FormState> {
   const session: {user: {id: string}} | null = await getServerSession(authOptions);
   
 
   if (!session || !session.user || !session.user.id) {
     return {
-      ...prevState,
       errorMessage: "User not authenticated",
       successMessage: "",
     };
   }
 
-  const formData = {
-    username: data.get("username") as string,
-    name: data.get("name") as string,
-    bio: data.get("bio") as string,
-  };
+  const formData = Object.fromEntries(data);
+  const parsed = editProfileSchema.safeParse(formData);
+
+  if(!parsed.success){
+    return {
+      errorMessage: "Error during edit profile",
+      successMessage: "",
+    };
+  }
 
   try {
       const existingUsername = await db
       .select()
       .from(usersTable)
-      .where(eq(usersTable.username, formData.username))
+      .where(eq(usersTable.username, parsed.data.username))
       .limit(1)
 
       const currentUsername = await db
@@ -46,10 +49,9 @@ export async function editProfileAction(prevState: FormState, data: FormData) {
 
       if (
         existingUsername.length > 0 &&
-        formData.username !== currentUsername[0].username
+        parsed.data.username !== currentUsername[0].username
       ) {
         return {
-          ...prevState,
           errorMessage: "Username already exists",
           successMessage: "",
         };
@@ -58,22 +60,21 @@ export async function editProfileAction(prevState: FormState, data: FormData) {
     await db
       .update(usersTable)
       .set({
-        username: formData.username,
-        name: formData.name,
-        bio: formData.bio,
+        username: parsed.data.username,
+        name: parsed.data.name,
+        bio: parsed.data.bio,
       })
       .where(eq(usersTable.id, session.user.id));
 
       revalidatePath("/profile")
+      
     return {
-      ...prevState,
       errorMessage: "",
       successMessage: "Profile edited successfully",
     };
 
   } catch (err: any) {
     return {
-      ...prevState,
       errorMessage: "Error: " + err.message,
       successMessage: "",
     };

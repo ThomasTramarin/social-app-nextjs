@@ -1,4 +1,4 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import EditProfileForm from "@/components/profile/EditProfileForm";
 import { getServerSession } from "next-auth";
 
@@ -11,9 +11,10 @@ export default async function ProfileEditPage() {
     },
   });
   const userData = await res.json();
+
   return (
     <div>
-      <h1>Edit Profile</h1>
+      <h1 className="mb-8">Edit Profile</h1>
       <EditProfileForm data={userData}/>
     </div>
   );
