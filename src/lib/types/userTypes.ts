@@ -6,5 +6,6 @@ export type UserProfileData = {
       username: string;
       name: string;
       bio: string;
+      avatar: string;
     };
   }

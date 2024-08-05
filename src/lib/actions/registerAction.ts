@@ -58,6 +58,7 @@ export default async function registerAction(
       username: parsed.data.username,
       name: parsed.data.username,
       bio: "",
+      avatar: "",
       password: hashedPassword,
     })
 

@@ -3,6 +3,8 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { profileLinks, Item } from "@/lib/constants/profileLinks";
 import { UserProfileData } from "@/lib/types/userTypes";
+import { RxAvatar } from "react-icons/rx";
+import Image from "next/image";
 export default function ProfileInfo(userData: UserProfileData) {
   const pathname = usePathname();
 
@@ -10,7 +12,17 @@ export default function ProfileInfo(userData: UserProfileData) {
     <div className="mt-10 md:mt-16 flex flex-col items-center">
       <div className="flex items-center justify-between gap-5 w-full md:px-10">
         <div className="flex items-center gap-5">
-          <div className="w-[100px] h-[100px] bg-dark-2 rounded-full"></div>
+        {userData.data.avatar ? (
+            <Image
+              src={userData.data.avatar}
+              width={100}
+              height={100}
+              className="rounded-full w-[100px] h-[100px] object-cover object-center"
+              alt="User profile avatar"
+            />
+          ) : (
+            <RxAvatar size={100} className="mb-5" />
+          )}
           <div className="max-w-28 md:max-w-40 overflow-auto">
             <div className="font-semibold text-[20px] text-black dark:text-white">
               {userData.data.name}

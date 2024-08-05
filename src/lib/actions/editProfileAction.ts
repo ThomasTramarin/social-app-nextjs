@@ -15,17 +15,18 @@ type FormState = {
 export async function editProfileAction(data: FormData): Promise<FormState> {
   const session: {user: {id: string}} | null = await getServerSession(authOptions);
   
-
+  
   if (!session || !session.user || !session.user.id) {
     return {
       errorMessage: "User not authenticated",
       successMessage: "",
     };
   }
-
+  
   const formData = Object.fromEntries(data);
   const parsed = editProfileSchema.safeParse(formData);
 
+  console.log(parsed)
   if(!parsed.success){
     return {
       errorMessage: "Error during edit profile",
@@ -63,8 +64,10 @@ export async function editProfileAction(data: FormData): Promise<FormState> {
         username: parsed.data.username,
         name: parsed.data.name,
         bio: parsed.data.bio,
+        avatar: parsed.data.avatar
       })
       .where(eq(usersTable.id, session.user.id));
+
 
       revalidatePath("/profile")
       
