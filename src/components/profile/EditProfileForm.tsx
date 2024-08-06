@@ -51,7 +51,10 @@ export default function EditProfileForm(userData: UserProfileData) {
     formData.append("username", data.username);
     formData.append("name", data.name);
     formData.append("bio", data.bio);
-    formData.append("avatar", avatar?.secure_url);
+    
+    if (avatar?.secure_url) {
+      formData.append("avatar", avatar.secure_url);
+    }
 
     const res = await editProfileAction(formData);
     setFormState(res);

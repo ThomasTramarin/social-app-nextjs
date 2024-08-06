@@ -23,7 +23,7 @@ export default function ProfileInfo(userData: UserProfileData) {
           ) : (
             <RxAvatar size={100} className="mb-5" />
           )}
-          <div className="max-w-28 md:max-w-40 overflow-auto">
+          <div className="max-w-28 md:max-w-52 overflow-auto">
             <div className="font-semibold text-[20px] text-black dark:text-white">
               {userData.data.name}
             </div>

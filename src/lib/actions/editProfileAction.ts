@@ -23,7 +23,13 @@ export async function editProfileAction(data: FormData): Promise<FormState> {
     };
   }
   
-  const formData = Object.fromEntries(data);
+  const formData = {
+    username: data.get('username') as string,
+    name: data.get('name') as string,
+    bio: data.get('bio') as string,
+    avatar: data.get('avatar') as string | null,
+  };
+
   const parsed = editProfileSchema.safeParse(formData);
 
   console.log(parsed)
@@ -64,7 +70,7 @@ export async function editProfileAction(data: FormData): Promise<FormState> {
         username: parsed.data.username,
         name: parsed.data.name,
         bio: parsed.data.bio,
-        avatar: parsed.data.avatar
+        // avatar: parsed.data.avatar
       })
       .where(eq(usersTable.id, session.user.id));
 
