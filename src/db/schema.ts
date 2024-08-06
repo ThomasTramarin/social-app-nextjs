@@ -16,9 +16,10 @@ export const postsTable = sqliteTable("posts", {
   post_id: text("post_id").notNull().primaryKey().default(uuidv4()),
   author_id: text("author_id").notNull().references(()=> usersTable.id),
   creation_date: text("creation_date").notNull().default(sql`CURRENT_TIMESTAMP`),
-  hashtags: text('hashtags'),
   text: text('text'),
   image_url: text('image_url'),
+  allow_comments: integer("allow_comments", {mode: "boolean"}).notNull(),  // 1 = allowed, 0 = disallowed
+  visibility: text("visibility").notNull().default("public")
 })
 
 export const commentsTable = sqliteTable("comments", {
@@ -39,6 +40,19 @@ export const likesTable = sqliteTable("likes", {
   id: text("id").notNull().primaryKey().default(uuidv4()),
   post_id: text("post_id").notNull().references(() => postsTable.post_id),
   user_id: text("user_id").notNull().references(() => usersTable.id),
+});
+
+export const repostTable = sqliteTable("reposts", {
+  repost_id: text("repost_id").notNull().primaryKey().default(uuidv4()),
+  post_id: text("post_id").notNull().references(() => postsTable.post_id),
+  user_id: text("user_id").notNull().references(() => usersTable.id),
+  creation_date: text("creation_date").notNull().default(sql`CURRENT_TIMESTAMP`),
+})
+
+export const blocksTable = sqliteTable("blocks", {
+  id: text("id").notNull().primaryKey().default(uuidv4()),
+  blocker_id: text("blocker_id").notNull().references(() => usersTable.id),
+  blocked_id: text("blocked_id").notNull().references(() => usersTable.id),
 });
 
 // export type UserSelect = typeof usersTable.$inferSelect;
