@@ -2,7 +2,6 @@ import { db } from "@/db";
 import { usersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { IoReturnUpBack } from "react-icons/io5";
 
 
 export async function GET(req: Request) {
