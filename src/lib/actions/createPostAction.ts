@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { postsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createPostSchema } from "../validations/createPostSchema";
 
 type FormState = {
@@ -50,6 +50,8 @@ export async function createPostAction(data: FormData): Promise<FormState> {
         allow_comments: parsed.data.allowComments,
         visibility: parsed.data.visibility,
       });
+
+      revalidateTag("user-profile-info");
 
     return {
       errorMessage: "",

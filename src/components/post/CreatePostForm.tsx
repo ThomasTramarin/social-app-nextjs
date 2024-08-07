@@ -193,6 +193,7 @@ export default function CreatePostForm(userData: UserProfileData) {
         <PostComponent
           avatarSrc={userData.data.avatar}
           authorName={userData.data.name}
+          authorUsername={userData.data.username}
           text={content}
           date="now"
           likes={0}

@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { usersTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { editProfileSchema } from "../validations/editProfileSchema";
 
 type FormState = {
@@ -32,7 +32,6 @@ export async function editProfileAction(data: FormData): Promise<FormState> {
 
   const parsed = editProfileSchema.safeParse(formData);
 
-  console.log(parsed)
   if(!parsed.success){
     return {
       errorMessage: "Error during edit profile",
@@ -75,7 +74,7 @@ export async function editProfileAction(data: FormData): Promise<FormState> {
       .where(eq(usersTable.id, session.user.id));
 
 
-      revalidatePath("/profile")
+      revalidateTag("user-profile-info")
       
     return {
       errorMessage: "",

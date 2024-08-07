@@ -10,6 +10,9 @@ export default async function ProfileLayout({
 }) {
   const session = await getServerSession(authOptions);
   const res = await fetch("http://localhost:3000/api/get-user-profile-info",{
+    next: {
+      tags: ["user-profile-info"]
+    },
     headers: {
       "Content-Type": "application/json",
       "Session": JSON.stringify(session)
