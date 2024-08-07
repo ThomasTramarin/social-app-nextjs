@@ -1,10 +1,21 @@
+"use client";
 import Image from "next/image";
 import { FiHeart } from "react-icons/fi";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { BiMessageDetail } from "react-icons/bi";
 import { HiMiniArrowPathRoundedSquare } from "react-icons/hi2";
-import { RxAccessibility, RxAvatar } from "react-icons/rx";
+import { RxAvatar } from "react-icons/rx";
 import Link from "next/link";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
+import deletePostAction from "@/lib/actions/deletePostAction";
+import { useState, useOptimistic } from "react";
 
 type PostProps = {
   avatarSrc: string;
@@ -16,6 +27,8 @@ type PostProps = {
   comments: number;
   reposts: number;
   image_url: string;
+  isOwner?: boolean;
+  postId?: string;
 };
 
 export default function PostComponent({
@@ -28,6 +41,8 @@ export default function PostComponent({
   comments,
   reposts,
   image_url,
+  isOwner,
+  postId,
 }: PostProps) {
   function extractHashtags(input: string): {
     text: string;
@@ -49,36 +64,41 @@ export default function PostComponent({
     const userTimezoneOffset = now.getTimezoneOffset() * 60000; // Offset in milliseconds
     const localDate = new Date(date.getTime() - userTimezoneOffset);
     const diff = now.getTime() - localDate.getTime();
-  
+
     const seconds = Math.floor(diff / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
-  
-    if(dateString === "now"){
-      return 'now';
+
+    if (dateString === "now") {
+      return "now";
     }
     if (seconds < 60) {
-      return 'now';
+      return "now";
     } else if (minutes < 60) {
       return `${minutes}m ago`;
     } else if (hours < 24) {
       return `${hours}h ago`;
     } else if (days === 1) {
-      return 'yesterday';
+      return "yesterday";
     } else if (days <= 7) {
       return `${days}d ago`;
     } else {
-      return localDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
+      return localDate.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
       });
     }
   }
 
   const { text: cleanText, hashtags } = extractHashtags(text);
   const cleanDate = dateFormat(date);
+
+  const [deleteState, setDeleteState] = useState({
+    successMessage: "",
+    errorMessage: "",
+  });
 
   return (
     <article className="p-2 bg-white dark:bg-gray-1 rounded-xl">
@@ -103,7 +123,7 @@ export default function PostComponent({
         <div className="text-black dark:text-white text-xs">{cleanDate}</div>
       </div>
 
-      <div className="text-[13px] text-gray-1 dark:text-gray-2 mx-10">
+      <div className="text-[14px] text-gray-1 dark:text-gray-2 mx-10">
         {cleanText}
       </div>
 
@@ -113,7 +133,6 @@ export default function PostComponent({
             <Image
               src={image_url}
               alt="Post Image"
-              layout="responsive"
               width={700}
               height={475}
               className="rounded-lg"
@@ -125,7 +144,12 @@ export default function PostComponent({
       {hashtags.length > 0 && (
         <div className="text-[13px] ml-10 text-blue dark:text-cyan font-medium">
           {hashtags.map((hashtag, index) => (
-            <span key={index}>{hashtag} </span>
+            <Link
+              href={`/search/hashtags/${hashtag.replace("#", "")}`}
+              key={index}
+            >
+              {hashtag}{" "}
+            </Link>
           ))}
         </div>
       )}
@@ -152,9 +176,42 @@ export default function PostComponent({
             </span>
           </div>
         </div>
-        <div>
-          <HiDotsHorizontal size={24} className="text-black dark:text-white" />
-        </div>
+        {isOwner && (
+          <div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant={"link"} aria-label="Post info">
+                  <HiDotsHorizontal
+                    size={24}
+                    className="text-black dark:text-white"
+                  />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-sm:max-w-[300px] rounded-xl">
+                <DialogHeader>
+                  <DialogTitle>Post info</DialogTitle>
+                </DialogHeader>
+                <Button onClick={() => deletePostAction(postId)}>
+                  Delete Post
+                </Button>
+                {deleteState && (
+                  <p
+                    aria-live="polite"
+                    className={`${
+                      deleteState.successMessage
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {deleteState.successMessage
+                      ? deleteState.successMessage
+                      : deleteState.errorMessage}
+                  </p>
+                )}
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
       </div>
     </article>
   );

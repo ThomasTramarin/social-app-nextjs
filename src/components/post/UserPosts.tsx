@@ -7,6 +7,7 @@ export default function UserPosts(userData: UserProfileData) {
       {userData.data.posts.map((item: Post) => (
         <PostComponent
           key={item.post_id}
+          postId={item.post_id}
           avatarSrc={userData.data.avatar}
           authorName={userData.data.name}
           authorUsername={userData.data.username}
@@ -16,6 +17,7 @@ export default function UserPosts(userData: UserProfileData) {
           comments={item.comments}
           reposts={item.reposts}
           image_url={item.image_url}
+          isOwner={true}
         />
       ))}
     </div>

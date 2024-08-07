@@ -62,7 +62,7 @@ export default function ProfileInfo(userData: UserProfileData) {
         <div className="w-[2px] bg-gray-1 dark:bg-gray-2"></div>
         <div className="text-center">
           <div className="font-medium text-black dark:text-white text-lg leading-4">
-            6
+            {userData.data.posts.length}
           </div>
           <div className="font-normal text-gray-1 dark:text-gray-2 text-sm">
             Post
