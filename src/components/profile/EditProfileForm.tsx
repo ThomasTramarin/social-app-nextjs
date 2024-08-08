@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/form";
 import { useEffect, useRef, useState } from "react";
 import { editProfileAction } from "@/lib/actions/editProfileAction";
-import { UserProfileData } from "@/lib/types/userTypes";
+import { UserProfileData } from "@/lib/types/types";
 import { Button } from "../ui/button";
 import Image from "next/image";
 

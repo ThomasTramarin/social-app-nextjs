@@ -1,4 +1,4 @@
-import { Post, UserProfileData } from "@/lib/types/userTypes";
+import { Post, UserProfileData } from "@/lib/types/types";
 import PostComponent from "./PostComponent";
 
 export default function UserPosts(userData: UserProfileData) {

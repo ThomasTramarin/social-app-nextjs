@@ -3,7 +3,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../authOptions";
 import { db } from "@/db";
-import { postsTable } from "@/db/schema";
+import { commentsTable, likesTable, postsTable } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { revalidateTag } from "next/cache";
 
@@ -15,6 +15,10 @@ export default async function deletePostAction(postId: string | undefined) {
 
   try {
     if (userId && postId) {
+      await db.delete(commentsTable).where(eq(commentsTable.post_id, postId));
+
+      await db.delete(likesTable).where(eq(likesTable.post_id, postId));
+
       await db
         .delete(postsTable)
         .where(

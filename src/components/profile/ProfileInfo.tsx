@@ -2,7 +2,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { profileLinks, Item } from "@/lib/constants/profileLinks";
-import { UserProfileData } from "@/lib/types/userTypes";
+import { UserProfileData } from "@/lib/types/types";
 import { RxAvatar } from "react-icons/rx";
 import Image from "next/image";
 export default function ProfileInfo(userData: UserProfileData) {

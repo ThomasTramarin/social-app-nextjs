@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import PostComponent from "./PostComponent";
-import { UserProfileData } from "@/lib/types/userTypes";
+import { UserProfileData } from "@/lib/types/types";
 
 export default function CreatePostForm(userData: UserProfileData) {
   const formRef = useRef<HTMLFormElement>(null);

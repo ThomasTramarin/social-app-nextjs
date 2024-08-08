@@ -25,7 +25,7 @@ export const postsTable = sqliteTable("posts", {
 export const commentsTable = sqliteTable("comments", {
   comment_id: text("comment_id").notNull().primaryKey().default(uuidv4()),
   post_id: text("post_id").notNull().references(()=> postsTable.post_id),
-  author_id: integer('author_id').references(() => usersTable.id).notNull(),
+  author_id: text('author_id').references(() => usersTable.id).notNull(),
   creation_date: text('creation_date').default(sql`CURRENT_TIMESTAMP`),
   text: text('text').notNull(),
 })

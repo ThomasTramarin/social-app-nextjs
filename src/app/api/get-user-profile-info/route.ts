@@ -26,9 +26,9 @@ export async function GET(req: Request) {
         creation_date: postsTable.creation_date,
         text: postsTable.text,
         image_url: postsTable.image_url,
-        likes: count(likesTable.id).as('likes_count'),
-        comments_count: count(commentsTable.comment_id).as('comments_count'),
-        reposts: count(repostTable.repost_id).as('reposts_count'),
+        likes: sql<number>`COUNT(DISTINCT ${likesTable.id})`.as('likes_count'),
+        comments_count: sql<number>`COUNT(DISTINCT ${commentsTable.comment_id})`.as('comments_count'),
+        reposts: sql<number>`COUNT(DISTINCT ${repostTable.repost_id})`.as('reposts_count'),
         userHasLiked: sql`EXISTS(SELECT 1 FROM ${likesTable} WHERE ${likesTable.post_id} = ${postsTable.post_id} AND ${likesTable.user_id} = ${userId})`.as("userHasLiked"),
       })
       .from(postsTable)
@@ -50,10 +50,13 @@ export async function GET(req: Request) {
         .select({
           comment_id: commentsTable.comment_id,
           author_id: commentsTable.author_id,
+          author_name: usersTable.name,       
+          author_avatar: usersTable.avatar,
           creation_date: commentsTable.creation_date,
           text: commentsTable.text,
         })
         .from(commentsTable)
+        .leftJoin(usersTable, eq(commentsTable.author_id, usersTable.id))
         .where(eq(commentsTable.post_id, post.post_id));
 
       return { ...post, comments };
