@@ -15,7 +15,10 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import deletePostAction from "@/lib/actions/deletePostAction";
-import { useState, useOptimistic } from "react";
+import { useState, useOptimistic, startTransition, useTransition } from "react";
+import postlikeAction from "@/lib/actions/postLikeAction";
+import { Comment } from "@/lib/types/userTypes";
+import PostComments from "./PostComments";
 
 type PostProps = {
   avatarSrc: string;
@@ -24,14 +27,17 @@ type PostProps = {
   text: string;
   date: string;
   likes: number;
-  comments: number;
   reposts: number;
   image_url: string;
   isOwner?: boolean;
   postId?: string;
+  userHasLiked: boolean;
+  comments: Comment[];
+  preview?: boolean;
 };
 
 export default function PostComponent({
+  preview,
   avatarSrc,
   authorName,
   authorUsername,
@@ -43,6 +49,7 @@ export default function PostComponent({
   image_url,
   isOwner,
   postId,
+  userHasLiked,
 }: PostProps) {
   function extractHashtags(input: string): {
     text: string;
@@ -100,8 +107,36 @@ export default function PostComponent({
     errorMessage: "",
   });
 
+  const [hasLiked, setHasLiked] = useState(userHasLiked);
+  const [openComments, setOpenComments] = useState(false);
+
+
+  const [optimisticLikeCount, setOptimisticLikeCount] = useOptimistic(
+    likes,
+    (prevCount) => {
+      return hasLiked ? prevCount - 1 : prevCount + 1;
+    }
+  );
+
+  const [isPending, startTransition] = useTransition();
+
+  const handleLike = async () => {
+    startTransition(() => {
+      setHasLiked(!hasLiked);
+      setOptimisticLikeCount((prevCount: number) =>
+        hasLiked ? prevCount - 1 : prevCount + 1
+      );
+    });
+
+    try {
+      await postlikeAction(postId, !userHasLiked);
+    } catch (error) {
+      console.error("Errore nel like del post:", error);
+    }
+  };
+
   return (
-    <article className="p-2 bg-white dark:bg-gray-1 rounded-xl">
+    <article className={`p-2 bg-white dark:bg-gray-1 ${!openComments ? "rounded-xl" : "rounded-t-xl"}`}>
       <div className="flex justify-between items-center text-sm">
         <div className="flex gap-2 items-center">
           {avatarSrc ? (
@@ -157,13 +192,33 @@ export default function PostComponent({
       <div className="ml-10 mt-4 flex justify-between">
         <div className="flex gap-5">
           <div className="flex flex-col items-center">
-            <FiHeart size={24} className="text-black dark:text-white" />
-            <span className="text-black dark:text-white text-xs">{likes}</span>
+            <button
+              onClick={handleLike}
+              aria-label="Like this post"
+              disabled={preview ? true : isPending}
+            >
+              <FiHeart
+                size={24}
+                className={`${
+                  hasLiked
+                    ? "text-blue dark:text-cyan"
+                    : "text-black dark:text-white"
+                }`}
+              />
+            </button>
+            <span className="text-black dark:text-white text-xs">
+              {optimisticLikeCount}
+            </span>
           </div>
           <div className="flex flex-col items-center">
-            <BiMessageDetail size={24} className="text-black dark:text-white" />
+            <button disabled={preview} onClick={() => setOpenComments(true)}>
+              <BiMessageDetail
+                size={24}
+                className="text-black dark:text-white"
+              />
+            </button>
             <span className="text-black dark:text-white text-xs">
-              {comments}
+              {comments.length}
             </span>
           </div>
           <div className="flex flex-col items-center">
@@ -213,6 +268,8 @@ export default function PostComponent({
           </div>
         )}
       </div>
+
+      <PostComments openComments={openComments}/>
     </article>
   );
 }

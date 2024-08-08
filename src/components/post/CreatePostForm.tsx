@@ -191,15 +191,17 @@ export default function CreatePostForm(userData: UserProfileData) {
       </Form>
       <div className="mt-10">
         <PostComponent
+          userHasLiked={false}
           avatarSrc={userData.data.avatar}
           authorName={userData.data.name}
           authorUsername={userData.data.username}
           text={content}
           date="now"
           likes={0}
-          comments={0}
+          comments={[]}
           reposts={0}
           image_url={image?.secure_url}
+          preview={true}
         />
       </div>
     </div>

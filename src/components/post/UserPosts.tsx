@@ -18,6 +18,7 @@ export default function UserPosts(userData: UserProfileData) {
           reposts={item.reposts}
           image_url={item.image_url}
           isOwner={true}
+          userHasLiked={item.userHasLiked}
         />
       ))}
     </div>
